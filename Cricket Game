@@ -1,0 +1,918 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+import random
+
+# 250 common British male forenames
+FORENAMES = [
+    "James", "John", "William", "David", "Michael", "Robert", "Richard", "Thomas", "Christopher", "Daniel",
+    "Paul", "Mark", "George", "Steven", "Andrew", "Edward", "Joseph", "Charles", "Stephen", "Matthew",
+    "Anthony", "Donald", "Kevin", "Jason", "Jeffrey", "Ryan", "Gary", "Timothy", "Scott", "Benjamin",
+    "Nicholas", "Jonathan", "Brian", "Adam", "Peter", "Ronald", "Kenneth", "Gregory", "Patrick", "Frank",
+    "Alexander", "Raymond", "Jack", "Dennis", "Jerry", "Tyler", "Aaron", "Jose", "Henry", "Douglas",
+    "Carl", "Arthur", "Ryan", "Roger", "Joe", "Juan", "Jack", "Albert", "Jonathan", "Justin",
+    "Terry", "Gerald", "Keith", "Samuel", "Willie", "Ralph", "Lawrence", "Nicholas", "Roy", "Benjamin",
+    "Bruce", "Brandon", "Adam", "Harry", "Fred", "Wayne", "Billy", "Steve", "Louis", "Jeremy",
+    "Aaron", "Randy", "Howard", "Eugene", "Carlos", "Russell", "Bobby", "Victor", "Martin", "Ernest",
+    "Phillip", "Todd", "Jesse", "Craig", "Alan", "Shawn", "Clarence", "Sean", "Philip", "Chris",
+    "Johnny", "Earl", "Jimmy", "Antonio", "Danny", "Bryan", "Tony", "Luis", "Mike", "Stanley",
+    "Leonard", "Nathan", "Dale", "Manuel", "Rodney", "Curtis", "Norman", "Allen", "Marvin", "Vincent",
+    "Glenn", "Jeffery", "Travis", "Jeff", "Chad", "Jacob", "Lee", "Melvin", "Alfred", "Kyle",
+    "Francis", "Bradley", "Jesus", "Herbert", "Frederick", "Ray", "Joel", "Edwin", "Don", "Eddie",
+    "Ricky", "Troy", "Randall", "Barry", "Alexander", "Bernard", "Mario", "Leroy", "Francisco", "Marcus",
+    "Micheal", "Theodore", "Clifford", "Miguel", "Oscar", "Jay", "Jim", "Tom", "Calvin", "Alex",
+    "Jon", "Ronnie", "Bill", "Lloyd", "Tommy", "Leon", "Derek", "Warren", "Darrell", "Jerome",
+    "Floyd", "Leo", "Alvin", "Tim", "Wesley", "Gordon", "Dean", "Greg", "Jorge", "Dustin",
+    "Pedro", "Derrick", "Dan", "Lewis", "Zachary", "Corey", "Herman", "Maurice", "Vernon", "Roberto",
+    "Clyde", "Glen", "Hector", "Shane", "Ricardo", "Sam", "Rick", "Lester", "Brent", "Ramon",
+    "Charlie", "Tyler", "Gilbert", "Gene", "Marc", "Reginald", "Ruben", "Brett", "Angel", "Nathaniel",
+    "Rafael", "Leslie", "Edgar", "Milton", "Raul", "Ben", "Chester", "Cecil", "Duane", "Franklin",
+    "Andre", "Elmer", "Brad", "Gabriel", "Ron", "Mitchell", "Roland", "Arnold", "Harvey", "Jared",
+    "Adrian", "Karl", "Cory", "Claude", "Erik", "Darryl", "Jamie", "Neil", "Jessie", "Christian",
+    "Javier", "Fernando", "Clinton", "Ted", "Mathew", "Tyrone", "Darren", "Lonnie", "Lance", "Cody"
+]
+
+# 250 common British surnames
+SURNAMES = [
+    "Smith", "Jones", "Taylor", "Brown", "Williams", "Wilson", "Johnson", "Davies", "Robinson", "Wright",
+    "Thompson", "Evans", "Walker", "White", "Roberts", "Green", "Hall", "Wood", "Jackson", "Clarke",
+    "Harris", "Clark", "Scott", "Turner", "Hill", "Moore", "Cooper", "Ward", "Morris", "King",
+    "Watson", "Harrison", "Morgan", "Baker", "Edwards", "Collins", "Stewart", "Marshall", "Owen", "Elliott",
+    "Reynolds", "Saunders", "Fox", "Graham", "Murray", "Hamilton", "Hughes", "Gibson", "Ellis", "Wilkinson",
+    "Foster", "Thomson", "Gordon", "Russell", "Pearson", "Holmes", "Mills", "Simpson", "Reid", "Ross",
+    "Henderson", "Paterson", "Jenkins", "Morgan", "Booth", "Walsh", "Hunter", "Thomson", "Saunders", "Reid",
+    "Young", "Gray", "Harding", "Mitchell", "Phillips", "Johnston", "Harvey", "Dunn", "Wallace", "Woods",
+    "Black", "Ferguson", "Alexander", "Parsons", "Hart", "Lawson", "McDonald", "Fraser", "Grant", "Carr",
+    "Anderson", "Johnston", "Matthews", "Patel", "Richardson", "Riley", "Bennett", "Cook", "Bailey", "Bell",
+    "Barker", "Murphy", "Kelly", "Booth", "Powell", "Begum", "Moss", "Mills", "Simpson", "Marshall",
+    "Holmes", "Sharp", "Day", "Brooks", "Atkinson", "Holland", "Allen", "Dawson", "Chapman", "Wilkinson",
+    "Lawrence", "Fuller", "Griffiths", "Willis", "Marsh", "Cunningham", "Stephenson", "Nicholson", "Burns", "Jennings",
+    "Ball", "Burton", "Spencer", "Walters", "Hewitt", "Jordan", "Lloyd", "Knight", "Rowe", "Armstrong",
+    "Berry", "Wells", "Williamson", "Bates", "Garner", "Hayward", "Gregory", "Newton", "Reeves", "Potter",
+    "Duncan", "Fletcher", "Andrews", "Goodwin", "Higgins", "Watkins", "Francis", "Stevenson", "Oliver", "Holt",
+    "Frost", "Bird", "Burgess", "Chambers", "Sutton", "Cooke", "Yates", "Pearce", "Dean", "Shepherd",
+    "Lowe", "Barnett", "Fowler", "Greenwood", "Hardy", "Watts", "Barrett", "Freeman", "Hartley", "Buckley",
+    "Davidson", "Cross", "Byrne", "Doyle", "Hammond", "Townsend", "Carpenter", "Daly", "Glover", "Middleton",
+    "Perkins", "Schofield", "Hilton", "Farrell", "Howell", "Robson", "Doherty", "Gibbs", "Forster", "Thornton",
+    "Connolly", "Atherton", "Parry", "Gill", "Pritchard", "Mellor", "Vaughan", "Howells", "Pollard", "Cullen",
+    "Rowlands", "Naylor", "Hodgson", "Butcher", "Brennan", "Slater", "Faulkner", "Chadwick", "Goddard", "Whittaker",
+    "Barlow", "Cope", "Beattie", "Briggs", "Parkinson", "Skelton", "Bowen", "Horton", "Gibbons", "Rodgers",
+    "Peacock", "Howe", "Stokes", "Rees", "Whelan", "Bradshaw", "Fenton", "Jarvis", "Knowles", "Finch",
+    "Milner", "Donnelly", "Weaver", "Lord", "Whitehouse", "Davey", "Cartwright", "Dickinson", "Kerry", "Giles"
+]
+
+class EnhancedCricketSimulator(tk.Tk):
+    PLAYER_ROLES = {
+        "Opening Batter": 15,
+        "Middle Order Batter": 17,
+        "Lower Order Batter": 12,
+        "Keeper Batter": 10,
+        "Batting Allrounder (Medium Pace)": 1,
+        "Batting Allrounder (Wrist Spin)": 1,
+        "Batting Allrounder (Finger Spin)": 1,
+        "Batting Allrounder (Fast Medium)": 1,
+        "Batting Allrounder (Fast)": 0,
+        "Bowling Allrounder (Medium Pace)": 1.5,
+        "Bowling Allrounder (Wrist Spin)": 1,
+        "Bowling Allrounder (Finger Spin)": 1,
+        "Bowling Allrounder (Fast Medium)": 1,
+        "Bowling Allrounder (Fast)": 0.5,
+        "Genuine Allrounder (Medium Pace)": 0.25,
+        "Genuine Allrounder (Wrist Spin)": 0.50,
+        "Genuine Allrounder (Finger Spin)": 0.50,
+        "Genuine Allrounder (Fast Medium)": 0.50,
+        "Genuine Allrounder (Fast)": 0.25,
+        "Finger Spinner": 9,
+        "Wrist Spinner": 7,
+        "Medium Pacer": 10,
+        "Fast Medium Pacer": 7,
+        "Fast Bowler": 2
+    }
+
+    def __init__(self):
+        super().__init__()
+        self.title("Enhanced Cricket Simulator")
+        self.geometry("1200x600")
+        self.teams = self.create_sample_teams()
+        self.youth_players = self.create_youth_players()
+        self.current_year = 2024
+        self.career_speed_records = []
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(expand=True, fill="both")
+        self.setup_tabs()
+
+    def create_sample_teams(self):
+        team_names = [
+            "Royal Challengers", "Super Kings", "Mumbai Indians", "Knight Riders",
+            "Sunrisers", "Capitals", "Punjab Kings", "Rajasthan Royals"
+        ]
+        teams = []
+        for name in team_names:
+            team = {
+                "name": name,
+                "players": [],
+                "matches_played": 0,
+                "matches_won": 0,
+                "matches_lost": 0,
+                "points": 0
+            }
+            for _ in range(15):
+                player = self.create_player(team["name"])
+                team["players"].append(player)
+            teams.append(team)
+        return teams
+
+    def get_random_role(self):
+        return random.choices(list(self.PLAYER_ROLES.keys()), weights=list(self.PLAYER_ROLES.values()))[0]
+
+    def generate_skills(self, role, is_youth=False):
+        max_skill = 75 if is_youth else 99
+        if "Batter" in role and "Allrounder" not in role:
+            batting = random.randint(60, max_skill)
+            bowling = random.randint(1, 30)
+        elif "Spinner" in role or "Pacer" in role or "Bowler" in role:
+            batting = random.randint(1, 30)
+            bowling = random.randint(60, max_skill)
+        elif "Batting Allrounder" in role:
+            batting = random.randint(70, max_skill)
+            bowling = random.randint(50, min(80, max_skill))
+        elif "Bowling Allrounder" in role:
+            batting = random.randint(50, min(80, max_skill))
+            bowling = random.randint(70, max_skill)
+        elif "Genuine Allrounder" in role:
+            batting = random.randint(60, max_skill)
+            bowling = random.randint(60, max_skill)
+        else:
+            batting = random.randint(30, max_skill)
+            bowling = random.randint(30, max_skill)
+        
+        return batting, bowling
+
+    def create_player(self, team_name):
+        role = self.get_random_role()
+        batting, bowling = self.generate_skills(role)
+        
+        return {
+            "name": f"{random.choice(FORENAMES)} {random.choice(SURNAMES)}",
+            "team": team_name,
+            "role": role,
+            "age": random.randint(20, 35),
+            "batting": batting,
+            "bowling": bowling,
+            "fielding": random.randint(50, 99),
+            "matches": 0,
+            "runs": 0,
+            "balls_faced": 0,
+            "highest_score": 0,
+            "wickets": 0,
+            "balls_bowled": 0,
+            "runs_conceded": 0,
+            "best_bowling": (0, 0),
+            "innings_played": 0,
+            "highest_speed": 0,
+            "total_speed": 0,
+            "speed_counts": 0,
+            "batting_points": 0,
+            "bowling_points": 0,
+            "allrounder_points": 0
+        }
+
+    def create_youth_players(self):
+        return [self.create_youth_player() for _ in range(50)]
+
+    def create_youth_player(self):
+        role = self.get_random_role()
+        batting, bowling = self.generate_skills(role, is_youth=True)
+        
+        return {
+            "name": f"{random.choice(FORENAMES)} {random.choice(SURNAMES)}",
+            "age": random.randint(13, 18),
+            "role": role,
+            "batting": batting,
+            "bowling": bowling,
+            "fielding": random.randint(30, 60),
+            "YouthBatAvg": random.uniform(10, 30 + batting/2),
+            "YouthBowlAvg": random.uniform(40 - bowling/2, 60)
+        }
+
+# ... (to be continued in Part 2)
+# ... (continued from Part 1)
+
+    def setup_tabs(self):
+        tabs = ["teams", "players", "fixtures", "batting_stats", "bowling_stats", "speed_data", "rankings", "youth"]
+        for tab in tabs:
+            frame = ttk.Frame(self.notebook)
+            self.notebook.add(frame, text=tab.capitalize())
+            getattr(self, f"create_{tab}_tab")(frame)
+
+    def create_teams_tab(self, parent):
+        columns = ("Team Name", "Matches Played", "Matches Won", "Matches Lost", "Points")
+        self.teams_tree = self.create_sortable_treeview(parent, columns)
+        self.update_teams_tab()
+
+    def create_players_tab(self, parent):
+        columns = ("Name", "Team", "Role", "Age", "Batting", "Bowling", "Fielding")
+        self.players_tree = self.create_sortable_treeview(parent, columns)
+        self.update_players_tab()
+
+    def create_fixtures_tab(self, parent):
+        self.fixtures_tree = self.create_sortable_treeview(parent, ("Match", "Result"))
+        self.simulate_button = ttk.Button(parent, text="Simulate Next Season", command=self.simulate_season)
+        self.simulate_button.pack(pady=10)
+
+    def create_batting_stats_tab(self, parent):
+        columns = ("Name", "Team", "Matches", "Runs", "Avg", "SR", "HS")
+        self.batting_stats_tree = self.create_sortable_treeview(parent, columns)
+        self.update_batting_stats_tab()
+
+    def create_bowling_stats_tab(self, parent):
+        columns = ("Name", "Team", "Matches", "Wickets", "Avg", "Econ", "SR", "Best")
+        self.bowling_stats_tree = self.create_sortable_treeview(parent, columns)
+        self.update_bowling_stats_tab()
+
+    def create_speed_data_tab(self, parent):
+        speed_notebook = ttk.Notebook(parent)
+        speed_notebook.pack(expand=True, fill="both")
+
+        season_frame = ttk.Frame(speed_notebook)
+        career_frame = ttk.Frame(speed_notebook)
+
+        speed_notebook.add(season_frame, text="Season Record")
+        speed_notebook.add(career_frame, text="Career Record")
+
+        season_columns = ("Name", "Team", "Role", "Highest Speed (km/h)", "Avg Pace (km/h)")
+        self.season_speed_tree = self.create_sortable_treeview(season_frame, season_columns)
+
+        career_columns = ("Name", "Team", "Role", "Highest Speed (km/h)", "Year")
+        self.career_speed_tree = self.create_sortable_treeview(career_frame, career_columns)
+
+    def create_rankings_tab(self, parent):
+        rankings_notebook = ttk.Notebook(parent)
+        rankings_notebook.pack(expand=True, fill="both")
+
+        batting_frame = ttk.Frame(rankings_notebook)
+        bowling_frame = ttk.Frame(rankings_notebook)
+        allrounder_frame = ttk.Frame(rankings_notebook)
+
+        rankings_notebook.add(batting_frame, text="Batting Rankings")
+        rankings_notebook.add(bowling_frame, text="Bowling Rankings")
+        rankings_notebook.add(allrounder_frame, text="Allrounder Rankings")
+
+        batting_columns = ("Rank", "Name", "Team", "Points", "Runs", "Average")
+        bowling_columns = ("Rank", "Name", "Team", "Points", "Wickets", "Average")
+        allrounder_columns = ("Rank", "Name", "Team", "Points", "Runs", "Wickets")
+
+        self.batting_rankings_tree = self.create_sortable_treeview(batting_frame, batting_columns)
+        self.bowling_rankings_tree = self.create_sortable_treeview(bowling_frame, bowling_columns)
+        self.allrounder_rankings_tree = self.create_sortable_treeview(allrounder_frame, allrounder_columns)
+
+        for tree in [self.batting_rankings_tree, self.bowling_rankings_tree, self.allrounder_rankings_tree]:
+            tree.bind("<Double-1>", self.show_player_details)
+
+    def create_youth_tab(self, parent):
+        columns = ("Name", "Age", "Role", "Batting", "Bowling", "Fielding", "YouthBatAvg", "YouthBowlAvg")
+        self.youth_tree = self.create_sortable_treeview(parent, columns)
+        self.update_youth_tab()
+
+    def create_sortable_treeview(self, parent, columns):
+        tree = ttk.Treeview(parent, columns=columns, show="headings")
+        for col in columns:
+            tree.heading(col, text=col, command=lambda _col=col: self.treeview_sort_column(tree, _col, False))
+            tree.column(col, width=100)
+        tree.pack(expand=True, fill="both")
+        return tree
+
+    def treeview_sort_column(self, tv, col, reverse):
+        l = [(tv.set(k, col), k) for k in tv.get_children('')]
+        try:
+            l.sort(key=lambda t: float(t[0]), reverse=reverse)
+        except ValueError:
+            l.sort(reverse=reverse)
+
+        for index, (val, k) in enumerate(l):
+            tv.move(k, '', index)
+
+        tv.heading(col, command=lambda: self.treeview_sort_column(tv, col, not reverse))
+
+    def update_teams_tab(self):
+        self.update_treeview(self.teams_tree, [
+            (team["name"], team["matches_played"], team["matches_won"], team["matches_lost"], team["points"])
+            for team in self.teams
+        ])
+
+    def update_players_tab(self):
+        self.update_treeview(self.players_tree, [
+            (p["name"], p["team"], p["role"], p["age"], p["batting"], p["bowling"], p["fielding"])
+            for team in self.teams for p in team["players"]
+        ])
+
+    def update_batting_stats_tab(self):
+        stats = []
+        for team in self.teams:
+            for player in team["players"]:
+                avg = player["runs"] / max(player["innings_played"], 1)
+                sr = (player["runs"] / max(player["balls_faced"], 1)) * 100
+                stats.append((player["name"], player["team"], player["matches"], player["runs"], f"{avg:.2f}", f"{sr:.2f}", player["highest_score"]))
+        self.update_treeview(self.batting_stats_tree, stats)
+
+    def update_bowling_stats_tab(self):
+        stats = []
+        for team in self.teams:
+            for player in team["players"]:
+                if player["balls_bowled"] > 0:
+                    avg = player["runs_conceded"] / max(player["wickets"], 1)
+                    econ = (player["runs_conceded"] / max(player["balls_bowled"] / 6, 1))
+                    sr = player["balls_bowled"] / max(player["wickets"], 1)
+                    best = f"{player['best_bowling'][0]}/{player['best_bowling'][1]}"
+                    stats.append((player["name"], player["team"], player["matches"], player["wickets"], f"{avg:.2f}", f"{econ:.2f}", f"{sr:.2f}", best))
+        self.update_treeview(self.bowling_stats_tree, stats)
+
+    def update_speed_data_tab(self):
+        season_stats = []
+        for team in self.teams:
+            for player in team["players"]:
+                if any(role in player["role"] for role in ["Fast Medium", "Fast"]):
+                    if player["speed_counts"] > 0:
+                        avg_pace = player["total_speed"] / player["speed_counts"]
+                        season_stats.append((player["name"], player["team"], player["role"], f"{player['highest_speed']:.1f}", f"{avg_pace:.1f}"))
+        
+        season_stats.sort(key=lambda x: float(x[3]), reverse=True)
+        self.update_treeview(self.season_speed_tree, season_stats[:15])
+
+        self.career_speed_records.sort(key=lambda x: x[3], reverse=True)
+        career_stats = [(record[0], record[1], record[2], f"{record[3]:.1f}", record[4]) for record in self.career_speed_records]
+        self.update_treeview(self.career_speed_tree, career_stats[:15])
+
+# ... (to be continued in Part 3)
+# ... (continued from Part 2)
+
+    def update_rankings_tab(self):
+        self.calculate_player_points()
+        
+        all_players = [player for team in self.teams for player in team["players"]]
+        
+        batting_rankings = sorted(all_players, key=lambda x: x['batting_points'], reverse=True)[:20]
+        bowling_rankings = sorted(all_players, key=lambda x: x['bowling_points'], reverse=True)[:20]
+        allrounder_rankings = sorted([p for p in all_players if p['wickets'] >= 50 and p['runs'] >= 500], 
+                                     key=lambda x: x['allrounder_points'], reverse=True)[:20]
+        
+        self.update_treeview(self.batting_rankings_tree, [
+            (i+1, p['name'], p['team'], f"{p['batting_points']:.0f}", p['runs'], f"{p['runs'] / max(p['innings_played'], 1):.2f}")
+            for i, p in enumerate(batting_rankings)
+        ])
+        self.update_treeview(self.bowling_rankings_tree, [
+            (i+1, p['name'], p['team'], f"{p['bowling_points']:.0f}", p['wickets'], f"{p['runs_conceded'] / max(p['wickets'], 1):.2f}")
+            for i, p in enumerate(bowling_rankings)
+        ])
+        self.update_treeview(self.allrounder_rankings_tree, [
+            (i+1, p['name'], p['team'], f"{p['allrounder_points']:.0f}", p['runs'], p['wickets'])
+            for i, p in enumerate(allrounder_rankings)
+        ])
+
+    def update_youth_tab(self):
+        self.update_treeview(self.youth_tree, [
+            (p["name"], p["age"], p["role"], p["batting"], p["bowling"], p["fielding"], f"{p['YouthBatAvg']:.2f}", f"{p['YouthBowlAvg']:.2f}")
+            for p in self.youth_players
+        ])
+
+    def update_treeview(self, tree, data):
+        tree.delete(*tree.get_children())
+        for item in data:
+            tree.insert("", "end", values=item)
+
+    def calculate_player_points(self):
+        for team in self.teams:
+            for player in team["players"]:
+                # Batting points
+                batting_avg = player["runs"] / max(player["innings_played"], 1)
+                player["batting_points"] = (player["runs"] / 30) * batting_avg
+
+                # Bowling points
+                if player["wickets"] > 0:
+                    bowling_avg = player["runs_conceded"] / player["wickets"]
+                    player["bowling_points"] = (player["wickets"] * 1000) / bowling_avg
+                else:
+                    player["bowling_points"] = 0
+
+                # Allrounder points
+                player["allrounder_points"] = player["batting_points"] + player["bowling_points"]
+
+    def show_player_details(self, event):
+        tree = event.widget
+        item = tree.selection()[0]
+        player_name = tree.item(item, "values")[1]
+        player = self.find_player_by_name(player_name)
+        
+        if player:
+            details = f"Name: {player['name']}\n"
+            details += f"Team: {player['team']}\n"
+            details += f"Age: {player['age']}\n"
+            details += f"Role: {player['role']}\n"
+            details += f"Batting Skill: {player['batting']}\n"
+            details += f"Bowling Skill: {player['bowling']}\n"
+            details += f"\nBatting Stats:\n"
+            details += f"Matches: {player['matches']}\n"
+            details += f"Runs: {player['runs']}\n"
+            details += f"Innings: {player['innings_played']}\n"
+            details += f"Average: {player['runs'] / max(player['innings_played'], 1):.2f}\n"
+            details += f"Strike Rate: {(player['runs'] / max(player['balls_faced'], 1)) * 100:.2f}\n"
+            details += f"Highest Score: {player['highest_score']}\n"
+            details += f"\nBowling Stats:\n"
+            details += f"Wickets: {player['wickets']}\n"
+            details += f"Balls Bowled: {player['balls_bowled']}\n"
+            details += f"Runs Conceded: {player['runs_conceded']}\n"
+            if player['wickets'] > 0:
+                details += f"Average: {player['runs_conceded'] / player['wickets']:.2f}\n"
+                details += f"Economy: {(player['runs_conceded'] / max(player['balls_bowled'] / 6, 1)):.2f}\n"
+                details += f"Strike Rate: {player['balls_bowled'] / max(player['wickets'], 1):.2f}\n"
+            details += f"Best Bowling: {player['best_bowling'][0]}/{player['best_bowling'][1]}\n"
+            
+            messagebox.showinfo("Player Details", details)
+
+    def find_player_by_name(self, name):
+        for team in self.teams:
+            for player in team['players']:
+                if player['name'] == name:
+                    return player
+        return None
+
+    def simulate_season(self):
+        fixtures = [(t1, t2) for t1 in self.teams for t2 in self.teams if t1 != t2]
+        results = [self.simulate_match(home, away) for home, away in fixtures]
+        for result in results:
+            self.update_team_stats(result)
+        self.update_fixtures_tab(results)
+        self.update_teams_tab()
+        self.update_batting_stats_tab()
+        self.update_bowling_stats_tab()
+        self.update_speed_data_tab()
+        self.update_rankings_tab()
+        self.age_up_players()
+        self.promote_youth_players()
+        self.current_year += 1
+        messagebox.showinfo("Season Complete", f"The {self.current_year-1} season has been simulated.")
+
+    def simulate_match(self, team1, team2):
+        innings1 = self.simulate_innings(team1, team2)
+        innings2 = self.simulate_innings(team2, team1)
+        
+        if innings1['score'] > innings2['score']:
+            result = f"{team1['name']} won by {innings1['score'] - innings2['score']} runs"
+            winner, loser = team1, team2
+        elif innings2['score'] > innings1['score']:
+            result = f"{team2['name']} won by {10 - innings2['wickets']} wickets"
+            winner, loser = team2, team1
+        else:
+            result, winner, loser = "Match Tied", None, None
+        
+        return {
+            "team1": team1, "team2": team2, "result": result,
+            "winner": winner, "loser": loser,
+            "innings1": innings1, "innings2": innings2
+        }
+
+    def simulate_innings(self, batting_team, bowling_team):
+        total_runs = 0
+        wickets = 0
+        balls = 0
+        batsmen = sorted(batting_team['players'], key=lambda x: x['batting'], reverse=True)
+        bowlers = sorted([p for p in bowling_team['players'] if p['role'] in ["Fast Bowler", "Fast Medium Pacer", "Spin Bowler", "Medium Pacer", "Finger Spinner", "Wrist Spinner"] or "Allrounder" in p['role']], key=lambda x: x['bowling'], reverse=True)[:6]
+        
+        for batsman in batsmen[:11]:  # Only the playing XI bat
+            if wickets < 10 and balls < 120:
+                runs, balls_faced, out = self.simulate_batsman_innings(batsman, bowlers, 120 - balls)
+                total_runs += runs
+                balls += balls_faced
+                batsman['runs'] += runs
+                batsman['balls_faced'] += balls_faced
+                batsman['matches'] += 1
+                batsman['innings_played'] += 1
+                batsman['highest_score'] = max(batsman['highest_score'], runs)
+                if out:
+                    wickets += 1
+
+        # Distribute bowling stats
+        for bowler in bowlers:
+            bowler['matches'] += 1
+            overs = min(4, (balls + 5) // 6 // len(bowlers))
+            bowler_balls = overs * 6
+            bowler_runs = int(total_runs * (bowler_balls / balls) * random.uniform(0.8, 1.2))
+            bowler_wickets = self.calculate_bowler_wickets(bowler, bowler_balls)
+            
+            bowler['balls_bowled'] += bowler_balls
+            bowler['runs_conceded'] += bowler_runs
+            bowler['wickets'] += bowler_wickets
+            
+            if bowler_wickets > bowler['best_bowling'][0] or (bowler_wickets == bowler['best_bowling'][0] and bowler_runs < bowler['best_bowling'][1]):
+                bowler['best_bowling'] = (bowler_wickets, bowler_runs)
+
+            self.update_bowler_speed(bowler)
+
+        return {'score': total_runs, 'wickets': wickets, 'balls': balls}
+
+# ... (to be continued in Part 4)
+# ... (continued from Part 3)
+
+    def simulate_batsman_innings(self, batsman, bowlers, max_balls):
+        runs = 0
+        balls_faced = 0
+        out = False
+        
+        while balls_faced < max_balls and not out:
+            bowler = random.choice(bowlers)
+            ball_result = self.simulate_ball(batsman, bowler)
+            
+            if ball_result == 'out':
+                out = True
+            else:
+                runs += ball_result
+                balls_faced += 1
+
+        return runs, balls_faced, out
+
+    def simulate_ball(self, batsman, bowler):
+        out_prob = 0.06 - (batsman['batting'] - bowler['bowling']) / 1500
+        out_prob = max(0.01, min(out_prob, 0.12))
+        
+        if random.random() < out_prob:
+            return 'out'
+        
+        if batsman['batting'] >= 90:
+            run_probs = [0.15, 0.25, 0.20, 0.05, 0.20, 0.15]
+        elif batsman['batting'] >= 80:
+            run_probs = [0.20, 0.30, 0.20, 0.05, 0.15, 0.10]
+        elif batsman['batting'] >= 70:
+            run_probs = [0.25, 0.35, 0.15, 0.05, 0.15, 0.05]
+        else:
+            run_probs = [0.35, 0.35, 0.15, 0.05, 0.08, 0.02]
+        
+        run_probs = [p * (1 + (batsman['batting'] - bowler['bowling']) / 150) for p in run_probs]
+        run_probs = [p / sum(run_probs) for p in run_probs]
+        
+        return random.choices([0, 1, 2, 3, 4, 6], weights=run_probs)[0]
+
+    def calculate_bowler_wickets(self, bowler, balls):
+        base_wickets = balls / 20
+        wicket_multiplier = 1.5 + (bowler['bowling'] - 50) / 100
+        expected_wickets = base_wickets * wicket_multiplier
+        
+        wickets = 0
+        for _ in range(int(balls)):
+            if random.random() < (expected_wickets / balls):
+                wickets += 1
+        
+        return min(wickets, 4)
+
+    def update_bowler_speed(self, bowler):
+        if any(role in bowler['role'] for role in ["Fast Medium", "Fast"]):
+            base_speed = 130
+            skill_bonus = (bowler['bowling'] - 50) * 0.5
+            max_speed = min(161, base_speed + skill_bonus)
+            
+            speed_variation = random.uniform(-3, 3)
+            match_speed = random.uniform(max_speed - 5, max_speed) + speed_variation
+            
+            bowler['highest_speed'] = max(bowler['highest_speed'], match_speed)
+            bowler['total_speed'] += match_speed
+            bowler['speed_counts'] += 1
+            
+            career_record = next((record for record in self.career_speed_records if record[0] == bowler['name']), None)
+            if career_record is None or match_speed > career_record[3]:
+                if career_record:
+                    self.career_speed_records.remove(career_record)
+                self.career_speed_records.append((bowler['name'], bowler['team'], bowler['role'], match_speed, self.current_year))
+
+    def update_team_stats(self, result):
+        for team in [result["team1"], result["team2"]]:
+            team["matches_played"] += 1
+        if result["winner"]:
+            result["winner"]["matches_won"] += 1
+            result["winner"]["points"] += 2
+            result["loser"]["matches_lost"] += 1
+
+    def update_fixtures_tab(self, results):
+        self.update_treeview(self.fixtures_tree, [
+            (f"{r['team1']['name']} vs {r['team2']['name']}", 
+             f"{r['result']} ({r['innings1']['score']}/{r['innings1']['wickets']} - {r['innings2']['score']}/{r['innings2']['wickets']})")
+            for r in results
+        ])
+
+    def age_up_players(self):
+        for team in self.teams:
+            retired_players = [p for p in team["players"] if p["age"] > 38 or (p["age"] > 35 and random.random() < 0.2)]
+            for retired_player in retired_players:
+                team["players"].remove(retired_player)
+                new_player = self.promote_youth_player() or self.create_player(team["name"])
+                team["players"].append(new_player)
+            for player in team["players"]:
+                player["age"] += 1
+                self.update_player_skills(player)
+
+        # Age up youth players
+        for youth in self.youth_players:
+            youth['age'] += 1
+            for skill in ['batting', 'bowling']:
+                skill_increase = random.randint(0, 2)
+                youth[skill] = min(70, youth[skill] + skill_increase)
+            youth['fielding'] = min(70, youth['fielding'] + random.randint(0, 2))
+            youth['YouthBatAvg'] = random.uniform(10, 30 + youth['batting']/2)
+            youth['YouthBowlAvg'] = random.uniform(40 - youth['bowling']/2, 60)
+
+        # Remove youth players over 19 and add new ones
+        self.youth_players = [y for y in self.youth_players if y['age'] <= 19]
+        while len(self.youth_players) < 50:
+            self.youth_players.append(self.create_youth_player())
+
+        self.balance_youth_skills()
+        self.ensure_top_players()
+        self.balance_player_roles()
+        self.update_players_tab()
+        self.update_youth_tab()
+
+    def balance_youth_skills(self):
+        for youth in self.youth_players:
+            if any(role in youth['role'] for role in ['Spinner', 'Fast Bowler', 'Fast Medium Pacer', 'Wrist Spinner', 'Medium Pacer']):
+                youth['batting'] = min(youth['batting'], 50)
+            elif any(role in youth['role'] for role in ['Batter', 'Keeper']):
+                youth['bowling'] = min(youth['bowling'], 20)
+
+    def ensure_top_players(self):
+        all_players = [player for team in self.teams for player in team["players"]]
+        
+        for skill in ['batting', 'bowling']:
+            top_players = sorted(all_players, key=lambda x: x[skill], reverse=True)
+            
+            # Ensure top 5 players have 90+ skills
+            for player in top_players[:5]:
+                if player[skill] < 90:
+                    player[skill] = random.randint(90, 99)
+            
+            # Ensure top 15 players have 80+ skills
+            for player in top_players[5:15]:
+                if player[skill] < 80:
+                    player[skill] = random.randint(80, 89)
+
+    def balance_player_roles(self):
+        for team in self.teams:
+            for player in team['players']:
+                if 'Bowling Allrounder' in player['role']:
+                    player['bowling'] = max(player['bowling'], player['batting'] + 20)
+                    player['batting'] = min(player['batting'], player['bowling'] - 20)
+                elif 'Batting Allrounder' in player['role']:
+                    player['batting'] = max(player['batting'], player['bowling'] + 20)
+                    player['bowling'] = min(player['bowling'], player['batting'] - 20)
+                elif any(role in player['role'] for role in ['Batter', 'Keeper']):
+                    player['bowling'] = min(player['bowling'], 20)
+                elif any(role in player['role'] for role in ['Spinner', 'Fast Bowler', 'Fast Medium Pacer', 'Wrist Spinner', 'Medium Pacer']):
+                    player['batting'] = min(player['batting'], 50)
+
+    def update_player_skills(self, player):
+        peak_age = random.randint(28, 32)
+        age_factor = 1 - abs(player["age"] - peak_age) / 20
+        
+        batting_change = random.randint(-2, 2) + (2 if player["age"] < peak_age else -2)
+        bowling_change = random.randint(-2, 2) + (2 if player["age"] < peak_age else -2)
+        
+        player["batting"] = max(1, min(99, player["batting"] + int(batting_change * age_factor)))
+        player["bowling"] = max(1, min(99, player["bowling"] + int(bowling_change * age_factor)))
+        
+        self.balance_player_roles()
+
+    def promote_youth_players(self):
+        for team in self.teams:
+            while len(team["players"]) < 15:
+                promoted_player = self.promote_youth_player()
+                if promoted_player:
+                    team["players"].append(promoted_player)
+                else:
+                    team["players"].append(self.create_player(team["name"]))
+
+    def promote_youth_player(self):
+        eligible_youth = [y for y in self.youth_players if y['batting'] >= 62 or y['bowling'] >= 62]
+        if eligible_youth:
+            promoted = random.choice(eligible_youth)
+            self.youth_players.remove(promoted)
+            return {
+                "name": promoted['name'],
+                "team": random.choice(self.teams)['name'],
+                "role": promoted['role'],
+                "age": promoted['age'],
+                "batting": promoted['batting'],
+                "bowling": promoted['bowling'],
+                "fielding": promoted['fielding'],
+                "matches": 0,
+                "runs": 0,
+                "balls_faced": 0,
+                "highest_score": 0,
+                "wickets": 0,
+                "balls_bowled": 0,
+                "runs_conceded": 0,
+                "best_bowling": (0, 0),
+                "innings_played": 0,
+                "highest_speed": 0,
+                "total_speed": 0,
+                "speed_counts": 0,
+                "batting_points": 0,
+                "bowling_points": 0,
+                "allrounder_points": 0
+            }
+        return None
+
+    def create_youth_player(self):
+        role = self.get_random_role()
+        batting = random.randint(30, 55) if random.random() < 0.75 else random.randint(56, 67)
+        bowling = random.randint(30, 55) if random.random() < 0.75 else random.randint(56, 67)
+        
+        player = {
+            "name": f"{random.choice(FORENAMES)} {random.choice(SURNAMES)}",
+            "age": random.randint(13, 18),
+            "role": role,
+            "batting": batting,
+            "bowling": bowling,
+            "fielding": random.randint(30, 60),
+            "YouthBatAvg": random.uniform(10, 30 + batting/2),
+            "YouthBowlAvg": random.uniform(40 - bowling/2, 60)
+        }
+        
+        if any(role in player['role'] for role in ['Spinner', 'Fast Bowler', 'Fast Medium Pacer', 'Wrist Spinner', 'Medium Pacer']):
+            player['batting'] = min(player['batting'], 50)
+        elif any(role in player['role'] for role in ['Batter', 'Keeper']):
+            player['bowling'] = min(player['bowling'], 20)
+        
+        return player
+
+    def normalize_skills(self):
+        all_players = [player for team in self.teams for player in team["players"]]
+        all_skills = [p['batting'] for p in all_players] + [p['bowling'] for p in all_players]
+        all_skills.sort()
+        total = len(all_skills)
+        
+        for player in all_players:
+            for skill in ['batting', 'bowling']:
+                if player[skill] <= all_skills[int(0.5 * total)]:
+                    player[skill] = max(50, min(70, player[skill]))
+                elif player[skill] <= all_skills[int(0.8 * total)]:
+                    player[skill] = max(70, min(80, player[skill]))
+                elif player[skill] <= all_skills[int(0.95 * total)]:
+                    player[skill] = max(80, min(90, player[skill]))
+                else:
+                    player[skill] = max(90, min(100, player[skill]))
+
+        self.ensure_top_players()
+        self.balance_player_roles()
+
+    def run_simulation(self):
+        while True:
+            self.simulate_season()
+            self.normalize_skills()
+            if not messagebox.askyesno("Continue Simulation", "Do you want to simulate another season?"):
+                break
+
+def simulate_odi_innings(self, batting_team, bowling_team):
+    total_runs = 0
+    wickets = 0
+    balls = 0
+    max_balls = 300  # 50 overs
+
+    batsmen = sorted(batting_team['players'], key=lambda x: x['batting'], reverse=True)
+    bowlers = sorted([p for p in bowling_team['players'] if p['role'] in ["Fast Bowler", "Fast Medium Pacer", "Spin Bowler", "Medium Pacer", "Finger Spinner", "Wrist Spinner"] or "Allrounder" in p['role']], key=lambda x: x['bowling'], reverse=True)[:7]
+
+    for batsman in batsmen[:11]:  # Only the playing XI bat
+        if wickets < 10 and balls < max_balls:
+            runs, balls_faced, out = self.simulate_batsman_odi_innings(batsman, bowlers, max_balls - balls)
+            total_runs += runs
+            balls += balls_faced
+            batsman['runs'] += runs
+            batsman['balls_faced'] += balls_faced
+            batsman['matches'] += 1
+            batsman['innings_played'] += 1
+            batsman['highest_score'] = max(batsman['highest_score'], runs)
+            if out:
+                wickets += 1
+
+    # Apply the 3% chance of a low score
+    if random.random() < 0.03:
+        total_runs = random.randint(70, 150)
+        balls = min(balls, 180)  # Max 30 overs for low scores
+
+    # Distribute bowling stats
+    for bowler in bowlers:
+        bowler['matches'] += 1
+        overs = min(10, (balls + 5) // 6 // len(bowlers))
+        bowler_balls = overs * 6
+        bowler_runs = int(total_runs * (bowler_balls / balls) * random.uniform(0.8, 1.2))
+        bowler_wickets = self.calculate_bowler_wickets(bowler, bowler_balls)
+        
+        bowler['balls_bowled'] += bowler_balls
+        bowler['runs_conceded'] += bowler_runs
+        bowler['wickets'] += bowler_wickets
+        
+        if bowler_wickets > bowler['best_bowling'][0] or (bowler_wickets == bowler['best_bowling'][0] and bowler_runs < bowler['best_bowling'][1]):
+            bowler['best_bowling'] = (bowler_wickets, bowler_runs)
+
+        self.update_bowler_speed(bowler)
+
+    return {'score': total_runs, 'wickets': wickets, 'balls': balls}
+
+def simulate_batsman_odi_innings(self, batsman, bowlers, max_balls):
+    runs = 0
+    balls_faced = 0
+    out = False
+    
+    while balls_faced < max_balls and not out:
+        bowler = random.choice(bowlers)
+        ball_result = self.simulate_odi_ball(batsman, bowler)
+        
+        if ball_result == 'out':
+            out = True
+        else:
+            runs += ball_result
+            balls_faced += 1
+
+    return runs, balls_faced, out
+
+def simulate_odi_ball(self, batsman, bowler):
+    out_prob = 0.015 - (batsman['batting'] - bowler['bowling']) / 2000
+    out_prob = max(0.005, min(out_prob, 0.03))
+    
+    if random.random() < out_prob:
+        return 'out'
+    
+    if batsman['batting'] >= 90:
+        run_probs = [0.20, 0.30, 0.20, 0.05, 0.20, 0.05]
+    elif batsman['batting'] >= 80:
+        run_probs = [0.25, 0.35, 0.20, 0.05, 0.13, 0.02]
+    elif batsman['batting'] >= 70:
+        run_probs = [0.30, 0.35, 0.20, 0.05, 0.09, 0.01]
+    else:
+        run_probs = [0.40, 0.35, 0.15, 0.05, 0.04, 0.01]
+    
+    run_probs = [p * (1 + (batsman['batting'] - bowler['bowling']) / 200) for p in run_probs]
+    run_probs = [p / sum(run_probs) for p in run_probs]
+    
+    return random.choices([0, 1, 2, 3, 4, 6], weights=run_probs)[0]
+
+def simulate_odi_match(self, team1, team2):
+    innings1 = self.simulate_odi_innings(team1, team2)
+    innings2 = self.simulate_odi_innings(team2, team1)
+    
+    if innings1['score'] > innings2['score']:
+        result = f"{team1['name']} won by {innings1['score'] - innings2['score']} runs"
+        winner, loser = team1, team2
+    elif innings2['score'] > innings1['score']:
+        result = f"{team2['name']} won by {10 - innings2['wickets']} wickets"
+        winner, loser = team2, team1
+    else:
+        result, winner, loser = "Match Tied", None, None
+    
+    return {
+        "team1": team1, "team2": team2, "result": result,
+        "winner": winner, "loser": loser,
+        "innings1": innings1, "innings2": innings2
+    }
+
+def adjust_player_averages(self):
+    for team in self.teams:
+        for player in team['players']:
+            innings = max(player['innings_played'], 1)
+            current_avg = player['runs'] / innings
+            
+            if player['batting'] >= 90:
+                target_avg = random.uniform(50, 60)
+            elif player['batting'] >= 80:
+                target_avg = random.uniform(40, 50)
+            elif player['batting'] >= 70:
+                target_avg = random.uniform(33, 40)
+            elif player['batting'] >= 60:
+                target_avg = random.uniform(23, 32)
+            else:
+                target_avg = random.uniform(15, 22)
+            
+            adjustment = (target_avg - current_avg) * innings
+            player['runs'] += int(adjustment)
+
+def simulate_odi_season(self):
+    fixtures = [(t1, t2) for t1 in self.teams for t2 in self.teams if t1 != t2]
+    results = [self.simulate_odi_match(home, away) for home, away in fixtures]
+    for result in results:
+        self.update_team_stats(result)
+    self.update_fixtures_tab(results)
+    self.update_teams_tab()
+    self.adjust_player_averages()
+    self.update_batting_stats_tab()
+    self.update_bowling_stats_tab()
+    self.update_speed_data_tab()
+    self.update_rankings_tab()
+    self.age_up_players()
+    self.promote_youth_players()
+    self.current_year += 1
+    messagebox.showinfo("Season Complete", f"The {self.current_year-1} ODI season has been simulated.")
+
+if __name__ == "__main__":
+    app = EnhancedCricketSimulator()
+    app.simulate_odi_season = simulate_odi_season
+    app.simulate_odi_innings = simulate_odi_innings
+    app.simulate_batsman_odi_innings = simulate_batsman_odi_innings
+    app.simulate_odi_ball = simulate_odi_ball
+    app.simulate_odi_match = simulate_odi_match
+    app.adjust_player_averages = adjust_player_averages
+    app.mainloop()
